@@ -135,28 +135,35 @@
 
 <section id="contact" class="contact reveal">
     <h2>Contact Me</h2>
-    <form>
+
+    <form id="contactForm" action="https://formspree.io/f/xqpkngdw" method="POST">
+
         <div class="input-group">
-            <input type="text" id="name" required>
+            <input type="text" id="name" name="name" required>
             <label for="name">Full Name</label>
         </div>
 
         <div class="input-group">
-            <input type="email" id="email" required>
+            <input type="email" id="email" name="email" required>
             <label for="email">Email Address</label>
         </div>
 
         <div class="input-group">
-            <input type="text" id="subject" required>
+            <input type="text" id="subject" name="subject" required>
             <label for="subject">Subject</label>
         </div>
 
         <div class="input-group">
-            <textarea id="message" required></textarea>
+            <textarea id="message" name="message" required></textarea>
             <label for="message">Message</label>
         </div>
 
-        <button type="submit">Send Message</button>
+        <button type="submit" id="sendButton">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+        </button>
+
+        <p id="formStatus" aria-live="polite" ></p>
+
     </form>
 
 </section>

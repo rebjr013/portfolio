@@ -161,9 +161,13 @@ color:white;
 text-decoration:none;
 }
 
+button a:hover {
+    color:black;
+}
+
 button:hover{
 transform:translateY(-5px);
-background:#e9280e;
+color: black;
 }
 
 .outline{
@@ -533,5 +537,74 @@ form{
 
     border-color:#38bdf8;
     box-shadow:0 0 15px rgba(56,189,248,.25);
+
+}
+
+/* =========================================
+   CONTACT FORM STATUS
+========================================= */
+
+#formStatus {
+    min-height: 24px;
+    margin-top: 15px;
+    text-align: center;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    opacity: 0;
+
+    transform: translateY(-5px);
+
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+/* Success message */
+
+#formStatus.success {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+    color: #4ade80;
+}
+
+
+/* Error message */
+
+#formStatus.error {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+    color: #f87171;
+}
+
+
+/* Disabled / sending button */
+
+#sendButton:disabled {
+
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+}
+
+
+/* Prevent hover animation while sending */
+
+#sendButton:disabled:hover {
+
+    transform: none;
+
+    box-shadow: none;
 
 }
