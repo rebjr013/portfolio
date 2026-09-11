@@ -156,10 +156,14 @@ transition:.4s;
 
 }
 
+button a{
+color:white;
+text-decoration:none;
+}
+
 button:hover{
-
 transform:translateY(-5px);
-
+background:#e9280e;
 }
 
 .outline{
