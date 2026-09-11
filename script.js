@@ -1,3 +1,138 @@
+const contactForm = document.getElementById("contactForm");
+const sendButton = document.getElementById("sendButton");
+const formStatus = document.getElementById("formStatus");
+
+if (contactForm) {
+
+    contactForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        // Disable button while sending
+        sendButton.disabled = true;
+
+        sendButton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Sending...
+        `;
+
+        // Clear previous message
+        formStatus.textContent = "";
+        formStatus.className = "";
+
+        try {
+
+            const response = await fetch(
+                contactForm.action,
+                {
+                    method: "POST",
+                    body: new FormData(contactForm),
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+
+            /* =========================================
+               IF SUCCESS
+            ========================================= */
+
+            if (response.ok) {
+
+                // Clear form fields
+                contactForm.reset();
+
+                formStatus.textContent =
+                    "Your message has been sent successfully!";
+
+                formStatus.classList.add("success");
+
+                // Remove success message after 5 seconds
+                setTimeout(() => {
+
+                    formStatus.textContent = "";
+                    formStatus.className = "";
+
+                }, 5000);
+
+            }
+
+
+            /* =========================================
+               IF FORMSPREE RETURNS AN ERROR
+            ========================================= */
+
+            else {
+
+                const data = await response
+                    .json()
+                    .catch(() => ({}));
+
+
+                if (
+                    data.errors &&
+                    data.errors.length > 0
+                ) {
+
+                    formStatus.textContent =
+                        data.errors
+                            .map(error => error.message)
+                            .join(", ");
+
+                } else {
+
+                    formStatus.textContent =
+                        "Something went wrong. Please try again.";
+
+                }
+
+
+                formStatus.classList.add("error");
+
+            }
+
+        }
+
+
+        /* =========================================
+           IF NETWORK ERROR
+        ========================================= */
+
+        catch (error) {
+
+            console.error(
+                "Contact form error:",
+                error
+            );
+
+            formStatus.textContent =
+                "Network error. Please check your connection and try again.";
+
+            formStatus.classList.add("error");
+
+        }
+
+
+        /* =========================================
+           RESTORE SEND BUTTON
+        ========================================= */
+
+        finally {
+
+            sendButton.disabled = false;
+
+            sendButton.innerHTML = `
+                <i class="fa-solid fa-paper-plane"></i>
+                Send Message
+            `;
+
+        }
+
+    });
+
+}
+
 const words = [
     "Software Developer",
     "Web Developer",
@@ -134,140 +269,3 @@ tl.to({}, {
     duration: .7,
     ease: "power2.inOut"
 }, "-=0.2");
-
-
-const contactForm = document.getElementById("contactForm");
-const sendButton = document.getElementById("sendButton");
-const formStatus = document.getElementById("formStatus");
-
-if (contactForm) {
-
-    contactForm.addEventListener("submit", async function (event) {
-
-        event.preventDefault();
-
-        // Disable button while sending
-        sendButton.disabled = true;
-
-        sendButton.innerHTML = `
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Sending...
-        `;
-
-        // Clear previous message
-        formStatus.textContent = "";
-        formStatus.className = "";
-
-        try {
-
-            const response = await fetch(
-                contactForm.action,
-                {
-                    method: "POST",
-                    body: new FormData(contactForm),
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                }
-            );
-
-
-            /* =========================================
-               IF SUCCESS
-            ========================================= */
-
-            if (response.ok) {
-
-                formStatus.textContent =
-                    "Your message has been sent successfully!";
-
-                formStatus.classList.add("success");
-
-                // Clear form fields
-                contactForm.reset();
-
-
-                // Remove success message after 5 seconds
-                setTimeout(() => {
-
-                    formStatus.textContent = "";
-                    formStatus.className = "";
-
-                }, 5000);
-
-            }
-
-
-            /* =========================================
-               IF FORMSPREE RETURNS AN ERROR
-            ========================================= */
-
-            else {
-
-                const data = await response
-                    .json()
-                    .catch(() => ({}));
-
-
-                if (
-                    data.errors &&
-                    data.errors.length > 0
-                ) {
-
-                    formStatus.textContent =
-                        data.errors
-                            .map(error => error.message)
-                            .join(", ");
-
-                } else {
-
-                    formStatus.textContent =
-                        "Something went wrong. Please try again.";
-
-                }
-
-
-                formStatus.classList.add("error");
-
-            }
-
-        }
-
-
-        /* =========================================
-           IF NETWORK ERROR
-        ========================================= */
-
-        catch (error) {
-
-            console.error(
-                "Contact form error:",
-                error
-            );
-
-            formStatus.textContent =
-                "Network error. Please check your connection and try again.";
-
-            formStatus.classList.add("error");
-
-        }
-
-
-        /* =========================================
-           RESTORE SEND BUTTON
-        ========================================= */
-
-        finally {
-
-            sendButton.disabled = false;
-
-            sendButton.innerHTML = `
-                <i class="fa-solid fa-paper-plane"></i>
-                Send Message
-            `;
-
-        }
-
-    });
-
-}
