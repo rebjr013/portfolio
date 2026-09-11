@@ -1,14 +1,60 @@
+/* =========================================================
+   CONTACT FORM - FORMSPREE
+   ONE SUCCESSFUL SUBMISSION PER EMAIL
+========================================================= */
+
 const contactForm = document.getElementById("contactForm");
 const sendButton = document.getElementById("sendButton");
 const formStatus = document.getElementById("formStatus");
 
-if (contactForm) {
+if (contactForm && sendButton && formStatus) {
 
     contactForm.addEventListener("submit", async function (event) {
 
-        event.preventDefault();
+        /* =========================================
+           PREVENT NORMAL FORM SUBMISSION
+        ========================================= */
 
-        // Disable button while sending
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        /* =========================================
+           GET EMAIL
+        ========================================= */
+
+        const emailInput = document.getElementById("email");
+
+        const email = emailInput.value
+            .trim()
+            .toLowerCase();
+
+
+        /* =========================================
+           CHECK IF EMAIL WAS ALREADY USED
+        ========================================= */
+
+        const submittedEmails =
+            JSON.parse(
+                localStorage.getItem("submittedEmails") || "[]"
+            );
+
+
+        if (submittedEmails.includes(email)) {
+
+            formStatus.textContent =
+                "This email has already submitted a message.";
+
+            formStatus.className = "error";
+
+            return;
+        }
+
+
+        /* =========================================
+           DISABLE BUTTON
+        ========================================= */
+
         sendButton.disabled = true;
 
         sendButton.innerHTML = `
@@ -16,9 +62,14 @@ if (contactForm) {
             Sending...
         `;
 
-        // Clear previous message
+
+        /* =========================================
+           CLEAR STATUS
+        ========================================= */
+
         formStatus.textContent = "";
         formStatus.className = "";
+
 
         try {
 
@@ -26,7 +77,9 @@ if (contactForm) {
                 contactForm.action,
                 {
                     method: "POST",
+
                     body: new FormData(contactForm),
+
                     headers: {
                         "Accept": "application/json"
                     }
@@ -35,20 +88,58 @@ if (contactForm) {
 
 
             /* =========================================
-               IF SUCCESS
+               SUCCESS
             ========================================= */
 
             if (response.ok) {
 
-                // Clear form fields
+                /*
+                 * Save the email ONLY after
+                 * Formspree successfully receives it.
+                 */
+
+                submittedEmails.push(email);
+
+                localStorage.setItem(
+                    "submittedEmails",
+                    JSON.stringify(submittedEmails)
+                );
+
+
+                /*
+                 * Clear form
+                 */
+
                 contactForm.reset();
+
+
+                /*
+                 * Show success message
+                 */
 
                 formStatus.textContent =
                     "Your message has been sent successfully!";
 
                 formStatus.classList.add("success");
 
-                // Remove success message after 5 seconds
+
+                /*
+                 * Restore button
+                 */
+
+                sendButton.disabled = false;
+
+                sendButton.innerHTML = `
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Send Message
+                `;
+
+
+                /*
+                 * Remove success message
+                 * after 5 seconds
+                 */
+
                 setTimeout(() => {
 
                     formStatus.textContent = "";
@@ -56,53 +147,51 @@ if (contactForm) {
 
                 }, 5000);
 
+
+                return;
             }
 
 
             /* =========================================
-               IF FORMSPREE RETURNS AN ERROR
+               FORMSPREE ERROR
             ========================================= */
 
-            else {
-
-                const data = await response
-                    .json()
-                    .catch(() => ({}));
+            const data = await response
+                .json()
+                .catch(() => ({}));
 
 
-                if (
-                    data.errors &&
-                    data.errors.length > 0
-                ) {
+            if (
+                data.errors &&
+                data.errors.length > 0
+            ) {
 
-                    formStatus.textContent =
-                        data.errors
-                            .map(error => error.message)
-                            .join(", ");
+                formStatus.textContent =
+                    data.errors
+                        .map(error => error.message)
+                        .join(", ");
 
-                } else {
+            } else {
 
-                    formStatus.textContent =
-                        "Something went wrong. Please try again.";
-
-                }
-
-
-                formStatus.classList.add("error");
+                formStatus.textContent =
+                    "Something went wrong. Please try again.";
 
             }
+
+
+            formStatus.classList.add("error");
 
         }
 
 
         /* =========================================
-           IF NETWORK ERROR
+           NETWORK ERROR
         ========================================= */
 
         catch (error) {
 
             console.error(
-                "Contact form error:",
+                "Contact Form Error:",
                 error
             );
 
@@ -115,7 +204,7 @@ if (contactForm) {
 
 
         /* =========================================
-           RESTORE SEND BUTTON
+           RESTORE BUTTON
         ========================================= */
 
         finally {
